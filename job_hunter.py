@@ -19,15 +19,21 @@ logger.addHandler(stream_handler)
 
 class Monster():
 
-    def __init__(self, job_name, location):
+    def __init__(self, job_name, city, state, zip_code):
         self.job_name = '-'.join(job_name.split(' '))
-        self.location = location
+        self.city = '-'.join(city.split(' '))
+        self.state = state
+        self.zip_code = zip_code
 
         logger.debug(f'Job Name: {self.job_name}')
 
-    def results():
-        requests.get('https://www.monster.com/jobs/\
-                      search/?q=Software-Developer&where=Australia')
-        pass
+    def results(self):
+        url = 'https://www.monster.com/jobs/search/'+\
+              f'?q={self.job_name}'+\
+              f'&where={self.city}-{self.state}-{self.zip_code}'
+        logger.debug(f'URL: {url}')
+        # requests.get(url)
 
-monster_search = Monster('Python Developer', 'Santa Clara')
+
+monster_search = Monster('Python Developer', 'San Jose', 'CA', '95128')
+monster_search.results()

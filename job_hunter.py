@@ -40,7 +40,7 @@ class Monster():
 
         return job_results
 
-    def scrape_jobs(self, jobs):
+    def scrape_jobs(self, jobs, filter=None):
         jobs_dict = {}
         for job in jobs:
             title = job.find('h2', class_='title')
@@ -58,7 +58,7 @@ class Monster():
             jobs_dict[title_key] = {'company': company_stripped,
                                     'location': location_stripped,
                                     'link' : link}
-            logger.debug(f'Job Title: {jobs_dict[title_key]}\n')
+            logger.debug(f'{title_key}: {jobs_dict[title_key]}\n')
 
     def all_jobs(self):
 
@@ -68,6 +68,31 @@ class Monster():
 
         return all_jobs_dict
 
+    def string_dec(self, filter_key):
+        def string_handler(text):
+            if text == None:
+                return False
+            else:
+                return filter_key in text.lower()
+        return string_handler
 
-monster_search = Monster('Python Developer', 'San Jose', 'CA', '95128')
+
+    def specific_jobs(self, filter_key) :
+
+        filter_key = filter_key.lower()
+        job_results = self.results()
+        job_titles = job_results.find_all('h2',
+                                    string=self.string_dec(filter_key))
+        id_list = [job.find_parent("section")['data-jobid'] for job in job_titles]
+        filtered_jobs = job_results.find_all('section',
+                                            class_='card-content',
+                                            attrs={"data-jobid": lambda text: text in id_list}
+                                            )
+        filtered_jobs_dict = self.scrape_jobs(filtered_jobs)
+        return filtered_jobs_dict
+
+
+monster_search = Monster('Software Developer', 'San Jose', 'CA', '95128')
 monster_search.all_jobs()
+monster_search.specific_jobs('python')
+
